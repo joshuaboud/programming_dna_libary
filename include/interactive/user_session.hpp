@@ -1,6 +1,6 @@
 #pragma once
 
-#include "user.hpp"
+#include <fundamental/user.hpp>
 
 #include <memory>
 
