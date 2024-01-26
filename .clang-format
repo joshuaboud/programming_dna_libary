@@ -3,5 +3,8 @@ BasedOnStyle: LLVM
 AllowAllConstructorInitializersOnNextLine: 'false'
 ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
 AllowShortFunctionsOnASingleLine: Empty
-
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Right
+BreakBeforeBraces: Attach
+Cpp11BracedListStyle: true
 ...

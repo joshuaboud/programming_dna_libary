@@ -6,28 +6,28 @@ class Book {
 private:
   std::string mId;
   std::string mTitle;
-  std::string mAuthors;
+  std::string mAuthor;
   std::string mLocation;
   std::string mIsbn;
   std::string mGenre;
 
 public:
   // Default Constructor
-  Book()
+  constexpr Book()
       : mId(""),
         mTitle(""),
-        mAuthors(""),
+        mAuthor(""),
         mLocation(""),
         mIsbn(""),
         mGenre("") {}
 
   // Parameterized Constructor
   Book(const std::string &id, const std::string &title,
-       const std::string &authors, const std::string &location,
+       const std::string &author, const std::string &location,
        const std::string &isbn, const std::string &genre)
       : mId(id),
         mTitle(title),
-        mAuthors(authors),
+        mAuthor(author),
         mLocation(location),
         mIsbn(isbn),
         mGenre(genre) {}
@@ -48,12 +48,12 @@ public:
     mTitle = title;
   }
 
-  const std::string &getAuthors() const {
-    return mAuthors;
+  const std::string &getAuthor() const {
+    return mAuthor;
   }
 
   void setAuthors(const std::string &authors) {
-    mAuthors = authors;
+    mAuthor = authors;
   }
 
   const std::string &getLocation() const {
