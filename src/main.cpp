@@ -12,12 +12,10 @@
 #include "ftxui/dom/table.hpp"
 
 int main(int argc, char *argv[]) {
-  
-  auto library = std::make_shared<Library>();
 
   auto screen = ftxui::ScreenInteractive::Fullscreen();
 
-  screen.Loop(MainView(library));
+  screen.Loop(MainView());
 
 
 

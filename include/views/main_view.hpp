@@ -15,40 +15,82 @@
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
-auto MainView(std::shared_ptr<Library> library) {
-  using namespace ftxui;
+class MainViewBase : public ftxui::ComponentBase {
+public:
+  MainViewBase()
+      : ftxui::ComponentBase(),
+        mTabIndex(0),
+        mTabHeaders({"Book Search", "Cart", "User"}) {
+    using namespace ftxui;
 
-  static int tabIndex = 0;
+    auto tabToggle = Toggle(&mTabHeaders, &mTabIndex);
 
-  static std::vector<std::string> tabHeaders = {
-      "Book Search",
-      "Cart",
-  };
+    auto tabContainer = Container::Tab(
+        {
+            SearchScreen(),
+            Renderer([] { return text("TODO") | bold; }),
+            Renderer([] { return text("TODO") | bold; }),
+        },
+        &mTabIndex
+    );
 
-  auto tabToggle = Toggle(&tabHeaders, &tabIndex);
+    Add(Renderer(Container::Vertical({tabToggle, tabContainer}), [=] {
+      return vbox({
+          hbox({
+              tabToggle->Render(),
+              separator(),
+          }),
+          separatorHeavy(),
+          tabContainer->Render(),
+      });
+    }));
+  }
 
-  auto tabContainer = Container::Tab(
-      {
-          SearchScreen(library),
-          Renderer([] { return text("TODO") | bold; }),
-      },
-      &tabIndex
-  );
+private:
+  int mTabIndex;
+  std::vector<std::string> mTabHeaders;
+};
 
-  auto container = Container::Vertical({
-      tabToggle,
-      tabContainer,
-  });
-
-  return Renderer(container, [=] {
-    return vbox({
-               hbox({
-                   tabToggle->Render(),
-                   separator(),
-               }),
-               separator(),
-               tabContainer->Render(),
-           }) |
-           border;
-  });
+ftxui::Component MainView() {
+  return ftxui::Make<MainViewBase>();
 }
+
+// auto MainView(std::shared_ptr<Library> library) {
+//   using namespace ftxui;
+
+//   static int tabIndex = 0;
+
+//   static std::vector<std::string> tabHeaders = {
+//       "Book Search",
+//       "Cart",
+//   };
+
+//   auto tabToggle = Toggle(&tabHeaders, &tabIndex);
+
+//   static auto searchScreen = SearchScreen(*library);
+
+//   auto tabContainer = Container::Tab(
+//       {
+//           searchScreen,
+//           Renderer([] { return text("TODO") | bold; }),
+//       },
+//       &tabIndex
+//   );
+
+//   auto container = Container::Vertical({
+//       tabToggle,
+//       tabContainer,
+//   });
+
+//   return Renderer(container, [=] {
+//     return vbox({
+//                hbox({
+//                    tabToggle->Render(),
+//                    separator(),
+//                }),
+//                separator(),
+//                tabContainer->Render(),
+//            }) |
+//            border;
+//   });
+// }

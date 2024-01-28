@@ -6,7 +6,14 @@ class Library {
 private:
   BookCollection mBookCollection;
 
+  Library() = default;
+
 public:
+  static Library &getInstance() {
+    static Library instance;
+    return instance;
+  }
+
   auto fetchBooks(std::span<BookFilter> filters) {
     return mBookCollection.fetchBooks(filters);
   }

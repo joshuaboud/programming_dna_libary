@@ -14,8 +14,8 @@ add_compile_options(
   -Wall
   -Wextra
   -Werror=return-type
-  -flto
-  -fanalyzer
+  # -flto
+  # -fanalyzer
 )
 
 add_compile_definitions(
@@ -23,7 +23,7 @@ add_compile_definitions(
 )
 
 add_link_options(
-  -flto
+  # -flto
 )
 
 add_executable(library_management_system
