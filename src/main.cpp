@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <fundamental/library.hpp>
+#include <management/cart.hpp>
 
 #include <views/main_view.hpp>
 

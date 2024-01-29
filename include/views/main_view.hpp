@@ -1,6 +1,7 @@
 #pragma once
 
 #include <views/search_screen.hpp>
+#include <views/cart_screen.hpp>
 
 #include <memory> // for allocator, __shared_ptr_access
 #include <string> // for char_traits, operator+, string, basic_string
@@ -28,7 +29,7 @@ public:
     auto tabContainer = Container::Tab(
         {
             SearchScreen(),
-            Renderer([] { return text("TODO") | bold; }),
+            CartScreen(),
             Renderer([] { return text("TODO") | bold; }),
         },
         &mTabIndex
