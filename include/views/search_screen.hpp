@@ -18,121 +18,6 @@
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
-// ftxui::Component TableRow(ftxui::Component component) {
-//   return std::move(component);
-// }
-
-// template <typename... Components>
-// ftxui::Component
-// TableRow(ftxui::Component component, int *width, Components... rest) {
-//   using namespace ftxui;
-//   return ResizableSplitLeft(
-//       std::move(component), TableRow(std::forward<Components>(rest)...),
-//       width
-//   );
-// }
-
-// class SearchResultRowBase : public ftxui::ComponentBase {
-// public:
-//   SearchResultRowBase(
-//       Book book, int &titleWidth, int &authorWidth, int &genreWidth,
-//       int &locationWidth, int &isbnWidth
-//   )
-//       : mBook(std::move(book)) {
-//     using namespace ftxui;
-
-//     Component title = Renderer([this] { return text(mBook.getTitle()); });
-//     Component author = Renderer([this] { return text(mBook.getAuthor()); });
-//     Component genre = Renderer([this] { return text(mBook.getGenre()); });
-//     Component location = Renderer([this] { return text(mBook.getLocation());
-//     }); Component isbn = Renderer([this] { return text(mBook.getIsbn()); });
-
-//     Component addToCartButton = Button(
-//         "Add To Cart", std::bind(&SearchResultRowBase::onAddToCart, this),
-//         ButtonOption::Simple()
-//     );
-
-//     Component cols = TableRow(
-//         title, &titleWidth, author, &authorWidth, genre, &genreWidth,
-//         location, &locationWidth, isbn
-//     );
-
-//     Add(Renderer(Container::Horizontal({cols, addToCartButton}), [=, this] {
-//       return hbox({
-//           cols->Render(),
-//           separator(),
-//           addToCartButton->Render(),
-//       });
-//     }));
-//   }
-
-//   bool Focusable() const override {
-//     return true;
-//   }
-
-// private:
-//   void onAddToCart() {
-//     Cart::getInstance().addBook(mBook);
-//   }
-
-//   Book mBook;
-// };
-
-// ftxui::Component SearchResultRow(
-//     Book book, int &titleWidth, int &authorWidth, int &genreWidth,
-//     int &locationWidth, int &isbnWidth
-// ) {
-//   return ftxui::Make<SearchResultRowBase>(
-//       book, titleWidth, authorWidth, genreWidth, locationWidth, isbnWidth
-//   );
-// }
-
-// class SearchResultsTableBase : public ftxui::ComponentBase {
-// public:
-//   SearchResultsTableBase(std::vector<Book> &results) : mResults(results) {
-//     using namespace ftxui;
-//     Component headers = TableRow(
-//         Renderer([this] { return text("Title"); }), &mTitleWidth,
-//         Renderer([this] { return text("Author"); }), &mAuthorWidth,
-//         Renderer([this] { return text("Genre"); }), &mGenreWidth,
-//         Renderer([this] { return text("Location"); }), &mLocationWidth,
-//         Renderer([this] { return text("ISBN"); })
-//     );
-//     Component container = Container::Vertical({});
-//     for (auto result : mResults) {
-//       container->Add(SearchResultRow(
-//           result, mTitleWidth, mAuthorWidth, mGenreWidth, mLocationWidth,
-//           mIsbnWidth
-//       ));
-//     }
-//     Add(Renderer(Container::Vertical({headers, container}), [=, this] {
-//       return vbox({
-//           headers->Render(),
-//           separator(),
-//           container->Render(),
-//       });
-//     }));
-//   }
-
-//   ftxui::Element Render() override {
-//     using namespace ftxui;
-//     return gridbox({{text("Title"), separator(), text("Author")}});
-//   }
-
-// private:
-//   int mTitleWidth = 15;
-//   int mAuthorWidth = 15;
-//   int mGenreWidth = 10;
-//   int mLocationWidth = 10;
-//   int mIsbnWidth = 15;
-
-//   std::vector<Book> &mResults;
-// };
-
-// ftxui::Component SearchResultsTable(std::vector<Book> &results) {
-//   return ftxui::Make<SearchResultsTableBase>(results);
-// }
-
 class SearchScreenBase : public ftxui::ComponentBase {
 public:
   SearchScreenBase()
@@ -184,13 +69,13 @@ public:
                   vbox({
                       searchButton->Render() | center,
                   }),
-              }) | notflex,
+              }), // | size(HEIGHT, GREATER_THAN, 6),
               separatorHeavy(),
-              mSearchResultsTable->Render() | vscroll_indicator | yframe |
-                  size(
-                      ftxui::WidthOrHeight::HEIGHT,
-                      ftxui::Constraint::LESS_THAN, 20
-                  ),
+              mSearchResultsTable->Render() | vscroll_indicator | yframe | flex, // |
+                  // size(
+                  //     ftxui::WidthOrHeight::HEIGHT,
+                  //     ftxui::Constraint::LESS_THAN, 20
+                  // ),
           });
         }
     ));
