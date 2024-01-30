@@ -2,6 +2,7 @@
 
 #include <interactive/book_filter.hpp>
 #include <management/cart.hpp>
+#include <util/events.hpp>
 
 #include <functional>
 #include <memory> // for allocator, __shared_ptr_access
@@ -213,8 +214,10 @@ private:
     mSearchResultsTable->DetachAllChildren();
 
     for (auto &book : results) {
-      auto addToCartButton =
-          Button("Add to Cart", [book] { Cart::getInstance().addBook(book); });
+      auto addToCartButton = Button("Add to Cart", [book] {
+        Cart::getInstance().addBook(book);
+        EventPublisher::getInstance().publish("updateCart", "updateCart");
+      });
 
       mSearchResultsTable
           ->Add(Renderer(addToCartButton, [book, addToCartButton, this] {

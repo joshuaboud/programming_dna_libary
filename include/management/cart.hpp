@@ -3,8 +3,8 @@
 #include <fundamental/book.hpp>
 
 #include <algorithm>
-#include <vector>
 #include <span>
+#include <vector>
 
 class Cart {
 public:
@@ -22,6 +22,11 @@ public:
   }
 
   void addBook(const Book &book) {
+    if (std::find_if(mBooks.begin(), mBooks.end(), [&book](const Book &b) {
+          return b.getId() == book.getId();
+        }) != mBooks.end()) {
+      return; // alreadt in cart
+    }
     mBooks.emplace_back(book);
   }
 

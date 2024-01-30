@@ -1,6 +1,7 @@
 #pragma once
 
 #include <management/cart.hpp>
+#include <util/events.hpp>
 
 #include "ftxui/component/captured_mouse.hpp" // for ftxui
 #include "ftxui/component/component.hpp"      // for Input, Renderer, Vertical
@@ -11,31 +12,51 @@
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
-ftxui::Component CartScreen() {
-  using namespace ftxui;
-  return Renderer([] {
+class CartScreenBase : public ftxui::ComponentBase {
+public:
+  CartScreenBase() : ftxui::ComponentBase() {
+    updateCartContents();
+    EventPublisher::getInstance().subscribe("updateCart", [this] (const std::string &) {
+      this->updateCartContents();
+    });
+  }
+
+private:
+  void updateCartContents() {
+    using namespace ftxui;
     auto books = Cart::getInstance().getBooks();
     auto container = Container::Vertical({});
     for (auto &book : books) {
-      container->Add(Renderer([=] {
+      auto removeBookButton = Button("Remove Book", [=] {
+        Cart::getInstance().removeBook(book);
+        EventPublisher::getInstance().publish("updateCart", "updateCart");
+      });
+      container->Add(Renderer(removeBookButton, [=] {
         return hbox({
                    paragraphAlignLeft(book.getTitle()) | flex,
                    separator(),
                    paragraphAlignLeft(book.getAuthor()) |
                        size(WIDTH, EQUAL, 20),
                    separator(),
-                   paragraphAlignLeft(book.getGenre()) |
-                       size(WIDTH, EQUAL, 20),
+                   paragraphAlignLeft(book.getGenre()) | size(WIDTH, EQUAL, 20),
                    separator(),
                    paragraphAlignLeft(book.getLocation()) |
                        size(WIDTH, EQUAL, 10),
                    separator(),
-                   paragraphAlignLeft(book.getIsbn()) |
-                       size(WIDTH, EQUAL, 15),
+                   paragraphAlignLeft(book.getIsbn()) | size(WIDTH, EQUAL, 15),
+                   separator(),
+                   vbox({
+                       removeBookButton->Render(),
+                   }),
                }) |
                xflex;
       }));
     }
-    return container->Render();
-  });
+    DetachAllChildren();
+    Add(container);
+  }
+};
+
+ftxui::Component CartScreen() {
+  return ftxui::Make<CartScreenBase>();
 }

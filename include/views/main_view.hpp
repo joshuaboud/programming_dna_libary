@@ -2,6 +2,7 @@
 
 #include <views/search_screen.hpp>
 #include <views/cart_screen.hpp>
+#include <util/events.hpp>
 
 #include <memory> // for allocator, __shared_ptr_access
 #include <string> // for char_traits, operator+, string, basic_string
@@ -21,8 +22,14 @@ public:
   MainViewBase()
       : ftxui::ComponentBase(),
         mTabIndex(0),
-        mTabHeaders({"Book Search", "Cart", "User"}) {
+        mTabHeaders({"Book Search", "Cart (0)", "User"}) {
     using namespace ftxui;
+
+    std::string &cartTabStringRef = mTabHeaders[1];
+
+    EventPublisher::getInstance().subscribe("updateCart", [&cartTabStringRef] (const std::string &){
+      cartTabStringRef = "Cart (" + std::to_string(Cart::getInstance().getBooks().size()) + ")";
+    });
 
     auto tabToggle = Toggle(&mTabHeaders, &mTabIndex);
 
