@@ -14,8 +14,8 @@ add_compile_options(
   -Wall
   -Wextra
   -Werror=return-type
-  # -flto
-  # -fanalyzer
+  $<$<CONFIG:Release,MinSizeRel,RelWithDebInfo>:-flto>
+  $<$<CONFIG:Release,MinSizeRel,RelWithDebInfo>:-fanalyzer>
 )
 
 add_compile_definitions(
@@ -23,7 +23,7 @@ add_compile_definitions(
 )
 
 add_link_options(
-  # -flto
+  $<$<CONFIG:Release,MinSizeRel,RelWithDebInfo>:-flto>
 )
 
 add_executable(library_management_system
@@ -43,3 +43,21 @@ target_link_libraries(library_management_system
   PRIVATE ftxui::dom
   PRIVATE ftxui::component
 )
+
+# Find OpenSSL package
+find_package(OpenSSL REQUIRED)
+
+# Check if OpenSSL is found
+if(OPENSSL_FOUND)
+    message(STATUS "OpenSSL found")
+    message(STATUS "OpenSSL include directories: ${OPENSSL_INCLUDE_DIR}")
+    message(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
+else()
+    message(FATAL_ERROR "OpenSSL not found")
+endif()
+
+# Link against OpenSSL libraries
+target_link_libraries(library_management_system PRIVATE ${OPENSSL_LIBRARIES})
+
+# Include OpenSSL headers
+target_include_directories(library_management_system PRIVATE ${OPENSSL_INCLUDE_DIR})

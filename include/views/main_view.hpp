@@ -1,8 +1,10 @@
 #pragma once
 
-#include <views/search_screen.hpp>
-#include <views/cart_screen.hpp>
+#include <interactive/user_session.hpp>
 #include <util/events.hpp>
+
+#include <views/cart_screen.hpp>
+#include <views/search_screen.hpp>
 
 #include <memory> // for allocator, __shared_ptr_access
 #include <string> // for char_traits, operator+, string, basic_string
@@ -22,14 +24,24 @@ public:
   MainViewBase()
       : ftxui::ComponentBase(),
         mTabIndex(0),
-        mTabHeaders({"Book Search", "Cart (0)", "User"}) {
+        mTabHeaders({"Book Search", getCartTabString(), getUserTabString()}) {
     using namespace ftxui;
 
     std::string &cartTabStringRef = mTabHeaders[1];
+    std::string &userTabStringRef = mTabHeaders[2];
 
-    EventPublisher::getInstance().subscribe("updateCart", [&cartTabStringRef] (const std::string &){
-      cartTabStringRef = "Cart (" + std::to_string(Cart::getInstance().getBooks().size()) + ")";
-    });
+    EventPublisher::getInstance().subscribe(
+        "updateCart",
+        [&cartTabStringRef](const std::string &) {
+          cartTabStringRef = getCartTabString();
+        }
+    );
+    EventPublisher::getInstance().subscribe(
+        "updateUserSession",
+        [&userTabStringRef](const std::string &) {
+          userTabStringRef = getUserTabString();
+        }
+    );
 
     auto tabToggle = Toggle(&mTabHeaders, &mTabIndex);
 
@@ -57,6 +69,19 @@ public:
 private:
   int mTabIndex;
   std::vector<std::string> mTabHeaders;
+
+  static std::string getCartTabString() {
+    return "Cart (" + std::to_string(Cart::getInstance().getBooks().size()) +
+           ")";
+  }
+
+  static std::string getUserTabString() {
+    if (auto currentUser = UserSession::getInstance().getUser()) {
+      return "User (" + currentUser->getFirstName() + " " +
+             currentUser->getLastName() + ")";
+    }
+    return "User (not logged in)";
+  }
 };
 
 ftxui::Component MainView() {

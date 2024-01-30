@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <util/password.hpp>
 
 class User {
 private:
@@ -8,19 +9,28 @@ private:
   std::string mFirstName;
   std::string mLastName;
   std::string mEmail;
-  std::string mPassword;
+  Password mPassword;
 
 public:
   // Default Constructor
-  User() : mId(""), mFirstName(""), mLastName(""), mEmail("") {}
+  User()
+      : mId(""),
+        mFirstName(""),
+        mLastName(""),
+        mEmail(""),
+        mPassword(Password::fromHash("")) {}
 
   // Parameterized Constructor
-  User(const std::string &id, const std::string &firstName,
-       const std::string &lastName, const std::string &email)
+  User(
+      const std::string &id, const std::string &firstName,
+      const std::string &lastName, const std::string &email,
+      const Password &password
+  )
       : mId(id),
         mFirstName(firstName),
         mLastName(lastName),
-        mEmail(email) {}
+        mEmail(email),
+        mPassword(password) {}
 
   const std::string &getId() const {
     return mId;
@@ -54,12 +64,12 @@ public:
     mEmail = email;
   }
 
-  const std::string &getPassword() const {
+  const Password &getPassword() const {
     // lol pwn'd
     return mPassword;
   }
 
-  void setPassword(const std::string &password) {
+  void setPassword(const Password &password) {
     mPassword = password;
   }
 };

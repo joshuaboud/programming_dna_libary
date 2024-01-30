@@ -1,14 +1,16 @@
 #pragma once
 
 #include <fundamental/user.hpp>
+#include <util/password.hpp>
 
 #include <memory>
+#include <optional>
 
 class UserSession {
 private:
-  std::shared_ptr<User> mUser;
+  std::optional<User> mUser;
 
-  UserSession() : mUser{nullptr} {}
+  UserSession() : mUser(std::nullopt) {}
 
 public:
   static UserSession &getInstance() {
@@ -17,19 +19,19 @@ public:
   }
 
   void setUser(const User &user) {
-    mUser = std::make_shared<User>(user);
+    mUser = user;
   }
 
-  User getUser() const {
-    return *mUser;
+  std::optional<User> getUser() const {
+    return mUser;
   }
 
   bool isLoggedIn() const {
-    return mUser.get() != nullptr;
+    return mUser.has_value();
   }
 
   bool logIn(User &user, const std::string &password) {
-    if (password != user.getPassword()) {
+    if (Password::fromPlainText(password) != user.getPassword()) {
       return false;
     }
     setUser(user);

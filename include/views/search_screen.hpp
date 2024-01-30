@@ -4,6 +4,9 @@
 #include <management/cart.hpp>
 #include <util/events.hpp>
 
+#include <views/book_table.hpp>
+#include <views/book_view.hpp>
+
 #include <functional>
 #include <memory> // for allocator, __shared_ptr_access
 #include <span>
@@ -69,13 +72,9 @@ public:
                   vbox({
                       searchButton->Render() | center,
                   }),
-              }), // | size(HEIGHT, GREATER_THAN, 6),
+              }),
               separatorHeavy(),
-              mSearchResultsTable->Render() | vscroll_indicator | yframe | flex, // |
-                  // size(
-                  //     ftxui::WidthOrHeight::HEIGHT,
-                  //     ftxui::Constraint::LESS_THAN, 20
-                  // ),
+              mSearchResultsTable->Render() | flex,
           });
         }
     ));
@@ -97,37 +96,31 @@ private:
     auto results = Library::getInstance().fetchBooks(filters);
 
     mSearchResultsTable->DetachAllChildren();
-
-    for (auto &book : results) {
-      auto addToCartButton = Button("Add to Cart", [book] {
+    mSearchResultsTable->Add(BookTable(results, {{
+      [] (Book book) {
         Cart::getInstance().addBook(book);
         EventPublisher::getInstance().publish("updateCart", "updateCart");
-      });
+      }
+    }}));
 
-      mSearchResultsTable
-          ->Add(Renderer(addToCartButton, [book, addToCartButton, this] {
-            return hbox({
-                       paragraphAlignLeft(book.getTitle()) | flex,
-                       separator(),
-                       paragraphAlignLeft(book.getAuthor()) |
-                           size(WIDTH, EQUAL, mAuthorWidth),
-                       separator(),
-                       paragraphAlignLeft(book.getGenre()) |
-                           size(WIDTH, EQUAL, mGenreWidth),
-                       separator(),
-                       paragraphAlignLeft(book.getLocation()) |
-                           size(WIDTH, EQUAL, mLocationWidth),
-                       separator(),
-                       paragraphAlignLeft(book.getIsbn()) |
-                           size(WIDTH, EQUAL, mIsbnWidth),
-                       separator(),
-                       vbox({
-                           addToCartButton->Render(),
-                       }),
-                   }) |
-                   xflex;
-          }));
-    }
+    // for (auto &book : results) {
+    //   auto addToCartButton = Button("Add to Cart", [book] {
+    //     Cart::getInstance().addBook(book);
+    //     EventPublisher::getInstance().publish("updateCart", "updateCart");
+    //   });
+
+    //   mSearchResultsTable
+    //       ->Add(Renderer(addToCartButton, [book, addToCartButton, this] {
+    //         return hbox({
+    //                    BookRowView(book),
+    //                    separator(),
+    //                    vbox({
+    //                        addToCartButton->Render(),
+    //                    }),
+    //                }) |
+    //                xflex;
+    //       }));
+    // }
   }
 
   std::string mTitleSearchStr;
@@ -136,12 +129,6 @@ private:
   std::string mIsbnSearchStr;
 
   ftxui::Component mSearchResultsTable;
-
-  int mTitleWidth = 20;
-  int mAuthorWidth = 20;
-  int mGenreWidth = 20;
-  int mLocationWidth = 10;
-  int mIsbnWidth = 15;
 };
 
 ftxui::Component SearchScreen() {
