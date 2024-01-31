@@ -1,8 +1,8 @@
 #pragma once
 
 #include <management/cart.hpp>
+#include <ui/book_table.hpp>
 #include <util/events.hpp>
-#include <views/book_table.hpp>
 
 #include <memory>
 #include <string>
@@ -17,16 +17,15 @@
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
-class CartScreenBase : public ftxui::ComponentBase {
+class CartScreenBase : public ftxui::ComponentBase, public SubscribesToEvents {
 public:
   CartScreenBase()
       : ftxui::ComponentBase(),
         mColumnWidths(std::make_shared<std::vector<int>>()) {
     updateCartContents();
-    EventPublisher::getInstance().subscribe(
-        "updateCart",
-        [this](const std::string &) { this->updateCartContents(); }
-    );
+    subscribe("updateCart", [this](const std::string &) {
+      this->updateCartContents();
+    });
   }
 
 private:
@@ -36,16 +35,7 @@ private:
     using namespace ftxui;
     auto books = Cart::getInstance().getBooks();
     DetachAllChildren();
-    Add(BookTable(
-        books, mColumnWidths,
-        {{std::tuple(
-            std::make_shared<std::string>("Remove from Cart"),
-            [](Book book) {
-              Cart::getInstance().removeBook(book);
-              EventPublisher::getInstance().publish("updateCart", "updateCart");
-            }
-        )}}
-    ));
+    Add(BookTable(books, mColumnWidths, {{&BookCartMembershipButton}}));
   }
 };
 

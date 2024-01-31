@@ -72,4 +72,8 @@ public:
   void setPassword(const Password &password) {
     mPassword = password;
   }
+
+  bool operator==(const User &other) const {
+    return getId() == other.getId();
+  }
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <util/book_collection.hpp>
+#include <fundamental/book_collection.hpp>
 #include <management/book_log.hpp>
 
 class Library {
@@ -8,7 +8,9 @@ private:
   BookCollection mBookCollection;
   BookLog mBookLog;
 
-  Library() = default;
+  Library() : mBookCollection(JsonBookCollection()) {
+    mBookCollection->initialize();
+  }
 
 public:
   static Library &getInstance() {
@@ -16,20 +18,8 @@ public:
     return instance;
   }
 
-  auto fetchBooks(std::span<BookFilter> filters) {
-    return mBookCollection.fetchBooks(filters);
-  }
-
-  auto addNewBook(const Book &book) {
-    return mBookCollection.addNewBook(book);
-  }
-
-  auto removeBook(const Book &book) {
-    return mBookCollection.removeBook(book);
-  }
-
-  auto editBook(const Book &book) {
-    return mBookCollection.editBook(book);
+  BookCollection &getBookCollection() {
+    return mBookCollection;
   }
 
   bool checkOutBooks(std::span<Book> books) {

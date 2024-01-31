@@ -1,6 +1,8 @@
 #pragma once
 
 #include <fundamental/book.hpp>
+#include <ui/text_observer.hpp>
+#include <ui/book_action_buttons.hpp>
 
 #include <algorithm>
 #include <array>
@@ -18,73 +20,6 @@
 #include "ftxui/dom/elements.hpp" // for text, hbox, separator, Element, operator|, vbox, border
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
-
-// ftxui::Component TableRow(ftxui::Component component) {
-//   return std::move(component);
-// }
-
-// template <typename... Components>
-// ftxui::Component
-// TableRow(ftxui::Component component, int *width, Components... rest) {
-//   using namespace ftxui;
-//   return ResizableSplitLeft(
-//       std::move(component), TableRow(std::forward<Components>(rest)...),
-//       width
-//   );
-// }
-
-// class ComponentTableRowBase : public ftxui::ComponentBase {
-// public:
-//   ComponentTableRowBase(std::shared_ptr<std::vector<int>> columnWidthsRef)
-//       : mColumnWidths(columnWidthsRef) {}
-
-//   void setContent(std::span<const ftxui::Component> components) {
-//     DetachAllChildren();
-//     Add(generateRow(components));
-//   }
-
-// private:
-//   std::shared_ptr<std::vector<int>> mColumnWidths;
-
-//   constexpr static const int sMaxInitialColumnWidth = 15;
-
-//   ftxui::Component
-//   generateRow(std::span<const ftxui::Component> columns, int columnIndex = 0)
-//   {
-//     using namespace ftxui;
-//     if (columnIndex == columns.size() - 1) {
-//       // base case
-//       return columns[columnIndex];
-//     }
-//     if (columnIndex >= mColumnWidths->size()) {
-//       mColumnWidths->emplace_back();
-//     }
-//     auto tempElement = columns[columnIndex]->Render();
-//     tempElement->ComputeRequirement();
-//     auto requiredWidth = tempElement->requirement().min_x;
-//     auto cappedWidth = std::min(requiredWidth, sMaxInitialColumnWidth);
-//     (*mColumnWidths)[columnIndex] =
-//         std::max(cappedWidth, (*mColumnWidths)[columnIndex]);
-//     return ResizableSplitLeft(
-//         columns[columnIndex], generateRow(columns, columnIndex + 1),
-//         &(*mColumnWidths)[columnIndex]
-//     );
-//   }
-// };
-
-// std::shared_ptr<ComponentTableRowBase>
-// ComponentTableRow(std::shared_ptr<std::vector<int>> columnWidthsRef) {
-//   return std::make_shared<ComponentTableRowBase>(columnWidthsRef);
-// }
-
-// std::shared_ptr<ComponentTableRowBase> ComponentTableRow(
-//     std::span<const ftxui::Component> components,
-//     std::shared_ptr<std::vector<int>> columnWidthsRef
-// ) {
-//   auto row = ComponentTableRow(columnWidthsRef);
-//   row->setContent(components);
-//   return row;
-// }
 
 class ComponentTableBase : public ftxui::ComponentBase {
 public:
@@ -158,30 +93,9 @@ ComponentTable(std::span<std::span<const ftxui::Component>> componentsGrid) {
   return table;
 }
 
-template <typename T>
-using TextObserverMethod = const std::string &(T::*)() const;
-
-template <typename T>
-ftxui::Component TextObserver(
-    const T &obj, TextObserverMethod<T> method, bool printBold = false
-) {
-  using namespace ftxui;
-  return Renderer([obj, method, printBold] {
-    auto e = paragraph(" " + (obj.*method)() + " ");
-    return printBold ? (e | bold) : e;
-  });
-}
-
 ftxui::Component BookTable(
-    std::span<Book> books,
-    std::shared_ptr<std::vector<int>> columnWidths,
-    std::span<
-      const std::tuple<
-        const std::shared_ptr<std::string>,
-        const std::function<void(Book)>
-      >
-    >
-        actions = {}
+    std::span<Book> books, std::shared_ptr<std::vector<int>> columnWidths,
+    std::span<const BookActionButtonFactory> actionButtonFactories = {}
 ) {
   using namespace ftxui;
   columnWidths->reserve(32);
@@ -195,7 +109,7 @@ ftxui::Component BookTable(
       TextObserver(headerDummyBook, &Book::getLocation, true),
       TextObserver(headerDummyBook, &Book::getIsbn, true),
   };
-  if (!actions.empty()) {
+  if (!actionButtonFactories.empty()) {
     tableHeaderComponents.emplace_back(Renderer([] {
       return text(" Actions ") | bold;
     }));
@@ -210,12 +124,10 @@ ftxui::Component BookTable(
         TextObserver(book, &Book::getLocation),
         TextObserver(book, &Book::getIsbn),
     };
-    if (!actions.empty()) {
+    if (!actionButtonFactories.empty()) {
       auto actionButtonContainer = Container::Horizontal({});
-      for (auto action : actions) {
-        actionButtonContainer->Add(Button(std::get<0>(action).get(), [book, action] {
-          std::get<1>(action)(book);
-        }));
+      for (auto actionButtonFactory : actionButtonFactories) {
+        actionButtonContainer->Add(actionButtonFactory(book));
       }
       bookRowComponents.emplace_back(Renderer(actionButtonContainer, [=] {
         return vbox({
@@ -237,13 +149,9 @@ ftxui::Component BookTable(
 
 ftxui::Component BookTable(
     std::span<Book> books,
-    std::span<
-      const std::tuple<
-        const std::shared_ptr<std::string>,
-        const std::function<void(Book)>
-      >
-    >
-        actions = {}
+    std::span<const BookActionButtonFactory> actionButtonFactories = {}
 ) {
-  return BookTable(books, std::make_shared<std::vector<int>>(), actions);
+  return BookTable(
+      books, std::make_shared<std::vector<int>>(), actionButtonFactories
+  );
 }

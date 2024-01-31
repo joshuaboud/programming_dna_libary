@@ -1,0 +1,258 @@
+[
+  {
+    "id": "001",
+    "title": "The Catcher in the Rye",
+    "author": "J.D. Salinger",
+    "location": "Shelf A",
+    "isbn": "978-0-316-76948-0",
+    "genre": "Fiction"
+  },
+  {
+    "id": "002",
+    "title": "To Kill a Mockingbird",
+    "author": "Harper Lee",
+    "location": "Shelf B",
+    "isbn": "0-06-112008-1",
+    "genre": "Classics"
+  },
+  {
+    "id": "003",
+    "title": "1984",
+    "author": "George Orwell",
+    "location": "Shelf C",
+    "isbn": "0-452-28423-4",
+    "genre": "Dystopian"
+  },
+  {
+    "id": "004",
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "location": "Shelf D",
+    "isbn": "978-0-7432-7356-5",
+    "genre": "Classics"
+  },
+  {
+    "id": "005",
+    "title": "Brave New World",
+    "author": "Aldous Huxley",
+    "location": "Shelf E",
+    "isbn": "978-0-06-085052-4",
+    "genre": "Dystopian"
+  },
+  {
+    "id": "006",
+    "title": "Moby-Dick",
+    "author": "Herman Melville",
+    "location": "Shelf F",
+    "isbn": "978-1-55742-009-1",
+    "genre": "Classics"
+  },
+  {
+    "id": "007",
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "location": "Shelf G",
+    "isbn": "978-0-14-143951-8",
+    "genre": "Classics"
+  },
+  {
+    "id": "008",
+    "title": "Frankenstein",
+    "author": "Mary Shelley",
+    "location": "Shelf H",
+    "isbn": "978-0-553-21129-8",
+    "genre": "Gothic"
+  },
+  {
+    "id": "009",
+    "title": "The Hobbit",
+    "author": "J.R.R. Tolkien",
+    "location": "Shelf I",
+    "isbn": "978-0-261-10211-0",
+    "genre": "Fantasy"
+  },
+  {
+    "id": "010",
+    "title": "One Hundred Years of Solitude",
+    "author": "Gabriel García Márquez",
+    "location": "Shelf J",
+    "isbn": "978-0-06-088328-7",
+    "genre": "Magical Realism"
+  },
+  {
+    "id": "011",
+    "title": "The Lord of the Rings",
+    "author": "J.R.R. Tolkien",
+    "location": "Shelf K",
+    "isbn": "978-0-345-33970-6",
+    "genre": "Fantasy"
+  },
+  {
+    "id": "012",
+    "title": "The Brothers Karamazov",
+    "author": "Fyodor Dostoevsky",
+    "location": "Shelf L",
+    "isbn": "978-0-14-044924-2",
+    "genre": "Classics"
+  },
+  {
+    "id": "013",
+    "title": "Crime and Punishment",
+    "author": "Fyodor Dostoevsky",
+    "location": "Shelf M",
+    "isbn": "978-0-451-52769-1",
+    "genre": "Classics"
+  },
+  {
+    "id": "014",
+    "title": "Anna Karenina",
+    "author": "Leo Tolstoy",
+    "location": "Shelf N",
+    "isbn": "978-0-19-874884-1",
+    "genre": "Classics"
+  },
+  {
+    "id": "015",
+    "title": "The Odyssey",
+    "author": "Homer",
+    "location": "Shelf O",
+    "isbn": "978-0-14-044911-2",
+    "genre": "Epic"
+  },
+  {
+    "id": "016",
+    "title": "The Picture of Dorian Gray",
+    "author": "Oscar Wilde",
+    "location": "Shelf P",
+    "isbn": "978-0-486-28211-1",
+    "genre": "Gothic"
+  },
+  {
+    "id": "017",
+    "title": "The Road",
+    "author": "Cormac McCarthy",
+    "location": "Shelf Q",
+    "isbn": "978-0-307-26543-2",
+    "genre": "Post-Apocalyptic"
+  },
+  {
+    "id": "018",
+    "title": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "location": "Shelf R",
+    "isbn": "978-0-14-144114-6",
+    "genre": "Gothic"
+  },
+  {
+    "id": "019",
+    "title": "The Adventures of Sherlock Holmes",
+    "author": "Arthur Conan Doyle",
+    "location": "Shelf S",
+    "isbn": "978-0-14-043908-3",
+    "genre": "Mystery"
+  },
+  {
+    "id": "020",
+    "title": "The Martian",
+    "author": "Andy Weir",
+    "location": "Shelf T",
+    "isbn": "978-0-553-41802-6",
+    "genre": "Science Fiction"
+  },
+  {
+    "id": "021",
+    "title": "The Count of Monte Cristo",
+    "author": "Alexandre Dumas",
+    "location": "Shelf U",
+    "isbn": "978-1-55742-023-7",
+    "genre": "Adventure"
+  },
+  {
+    "id": "022",
+    "title": "The Shining",
+    "author": "Stephen King",
+    "location": "Shelf V",
+    "isbn": "978-0-385-12167-5",
+    "genre": "Horror"
+  },
+  {
+    "id": "023",
+    "title": "The Hobbit",
+    "author": "J.R.R. Tolkien",
+    "location": "Shelf W",
+    "isbn": "978-0-261-10211-0",
+    "genre": "Fantasy"
+  },
+  {
+    "id": "024",
+    "title": "The Girl with the Dragon Tattoo",
+    "author": "Stieg Larsson",
+    "location": "Shelf X",
+    "isbn": "978-0-307-45474-6",
+    "genre": "Mystery"
+  },
+  {
+    "id": "025",
+    "title": "Wuthering Heights",
+    "author": "Emily Brontë",
+    "location": "Shelf Y",
+    "isbn": "978-0-14-143955-6",
+    "genre": "Gothic"
+  },
+  {
+    "id": "026",
+    "title": "Slaughterhouse-Five",
+    "author": "Kurt Vonnegut",
+    "location": "Shelf Z",
+    "isbn": "978-0-385-33384-9",
+    "genre": "Satire"
+  },
+  {
+    "id": "027",
+    "title": "Dracula",
+    "author": "Bram Stoker",
+    "location": "Shelf AA",
+    "isbn": "978-0-14-143984-6",
+    "genre": "Gothic"
+  },
+  {
+    "id": "028",
+    "title": "The Hunger Games",
+    "author": "Suzanne Collins",
+    "location": "Shelf AB",
+    "isbn": "978-0-439-02348-1",
+    "genre": "Dystopian"
+  },
+  {
+    "id": "029",
+    "title": "The Kite Runner",
+    "author": "Khaled Hosseini",
+    "location": "Shelf AC",
+    "isbn": "978-1-59448-000-3",
+    "genre": "Historical Fiction"
+  },
+  {
+    "id": "030",
+    "title": "A Game of Thrones",
+    "author": "George R.R. Martin",
+    "location": "Shelf AD",
+    "isbn": "978-0-553-57340-4",
+    "genre": "Fantasy"
+  },
+  {
+    "id": "031",
+    "title": "The Alchemist",
+    "author": "Paulo Coelho",
+    "location": "Shelf AE",
+    "isbn": "978-0-06-112241-5",
+    "genre": "Fantasy"
+  },
+  {
+    "id": "032",
+    "title": "The Hitchhiker's Guide to the Galaxy",
+    "author": "Douglas Adams",
+    "location": "Shelf AF",
+    "isbn": "978-0-345-39180-3",
+    "genre": "Science Fiction"
+  }
+]

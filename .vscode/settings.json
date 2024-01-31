@@ -89,7 +89,8 @@
         "variant": "cpp",
         "csignal": "cpp",
         "hash_set": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "ranges": "cpp"
     },
     "C_Cpp.formatting": "clangFormat"
 }

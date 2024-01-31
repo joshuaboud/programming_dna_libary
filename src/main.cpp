@@ -5,7 +5,7 @@
 #include <fundamental/library.hpp>
 #include <management/cart.hpp>
 
-#include <views/main_view.hpp>
+#include <ui/main_view.hpp>
 
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/screen/screen.hpp"

@@ -69,4 +69,8 @@ public:
   void setCheckOutDate(const std::chrono::system_clock::time_point &checkOutDate) {
     mCheckOutDate = checkOutDate;
   }
+
+  bool operator==(const BookCopy &other) const {
+    return getId() == other.getId();
+  }
 };

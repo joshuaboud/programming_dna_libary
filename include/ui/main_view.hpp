@@ -3,8 +3,8 @@
 #include <interactive/user_session.hpp>
 #include <util/events.hpp>
 
-#include <views/cart_screen.hpp>
-#include <views/search_screen.hpp>
+#include <ui/cart_screen.hpp>
+#include <ui/search_screen.hpp>
 
 #include <memory> // for allocator, __shared_ptr_access
 #include <string> // for char_traits, operator+, string, basic_string
@@ -19,7 +19,7 @@
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
-class MainViewBase : public ftxui::ComponentBase {
+class MainViewBase : public ftxui::ComponentBase, public SubscribesToEvents {
 public:
   MainViewBase()
       : ftxui::ComponentBase(),
@@ -30,13 +30,13 @@ public:
     std::string &cartTabStringRef = mTabHeaders[1];
     std::string &userTabStringRef = mTabHeaders[2];
 
-    EventPublisher::getInstance().subscribe(
+    subscribe(
         "updateCart",
         [&cartTabStringRef](const std::string &) {
           cartTabStringRef = getCartTabString();
         }
     );
-    EventPublisher::getInstance().subscribe(
+    subscribe(
         "updateUserSession",
         [&userTabStringRef](const std::string &) {
           userTabStringRef = getUserTabString();

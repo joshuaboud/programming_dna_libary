@@ -1,34 +1,32 @@
 #pragma once
 
+#include <util/string_utils.hpp>
+
+#include <functional>
 #include <string>
 
+using BookPropertyProvider = const std::string &(Book::*)() const;
 
 // TODO
 class BookFilter {
 public:
-  enum class Key {TITLE, AUTHOR, ISBN, GENRE};
+  BookFilter() = default;
+  BookFilter(
+      const std::string &searchText, BookPropertyProvider propertyProvider
+  )
+      : mSearchText(searchText),
+        mPropertyProvider(propertyProvider) {}
+
+  bool passes(const Book &book) const {
+    if (mPropertyProvider == nullptr)
+      return false;
+    return StringUtils::containsSubstring(
+        StringUtils::lowercase((book.*mPropertyProvider)()),
+        StringUtils::lowercase(mSearchText)
+    );
+  }
 
 private:
-  Key mKey;
-  std::string mValue;
-
-public:
-  BookFilter() {}
-  BookFilter(Key key, std::string value) : mKey{key}, mValue{value} {}
-
-  Key getKey() const {
-    return mKey;
-  }
-
-  void setKey(Key key) {
-    mKey = key;
-  }
-
-  const std::string &getValue() const {
-    return mValue;
-  }
-
-  void setValue(const std::string &value) {
-    mValue = value;
-  }
+  std::string mSearchText;
+  BookPropertyProvider mPropertyProvider;
 };

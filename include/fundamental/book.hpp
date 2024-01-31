@@ -52,7 +52,7 @@ public:
     return mAuthor;
   }
 
-  void setAuthors(const std::string &authors) {
+  void setAuthor(const std::string &authors) {
     mAuthor = authors;
   }
 
@@ -78,5 +78,9 @@ public:
 
   void setGenre(const std::string &genre) {
     mGenre = genre;
+  }
+
+  bool operator==(const Book &other) const {
+    return getId() == other.getId();
   }
 };

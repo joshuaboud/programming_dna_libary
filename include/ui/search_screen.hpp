@@ -1,11 +1,13 @@
 #pragma once
 
 #include <interactive/book_filter.hpp>
+#include <interactive/librarian.hpp>
 #include <management/cart.hpp>
 #include <util/events.hpp>
 
-#include <views/book_table.hpp>
-#include <views/book_view.hpp>
+#include <ui/book_action_buttons.hpp>
+#include <ui/book_table.hpp>
+#include <ui/book_view.hpp>
 
 #include <functional>
 #include <memory> // for allocator, __shared_ptr_access
@@ -51,6 +53,7 @@ public:
         mAuthorSearchStr(),
         mGenreSearchStr(),
         mIsbnSearchStr(),
+        mLocationSearchStr(),
         mSearchResultsTable(ftxui::Container::Vertical({ftxui::Renderer([] {
           return ftxui::text("Press Search");
         })})),
@@ -66,6 +69,7 @@ public:
         Input(&mAuthorSearchStr, "Search by Author", inputOptions),
         Input(&mGenreSearchStr, "Search by Genre", inputOptions),
         Input(&mIsbnSearchStr, "Search by ISBN", inputOptions),
+        Input(&mLocationSearchStr, "Search by Location", inputOptions),
     });
 
     Component searchButton =
@@ -87,6 +91,7 @@ public:
                       text(" Author: "),
                       text(" Genre: "),
                       text(" ISBN: "),
+                      text(" Location: "),
                   }),
                   vbox({
                       inputContainer->Render(),
@@ -108,27 +113,22 @@ private:
     using namespace ftxui;
     std::vector<BookFilter> filters;
     if (!mTitleSearchStr.empty())
-      filters.emplace_back(BookFilter::Key::TITLE, mTitleSearchStr);
+      filters.emplace_back(mTitleSearchStr, &Book::getTitle);
     if (!mAuthorSearchStr.empty())
-      filters.emplace_back(BookFilter::Key::AUTHOR, mAuthorSearchStr);
+      filters.emplace_back(mAuthorSearchStr, &Book::getAuthor);
     if (!mGenreSearchStr.empty())
-      filters.emplace_back(BookFilter::Key::GENRE, mGenreSearchStr);
+      filters.emplace_back(mGenreSearchStr, &Book::getGenre);
     if (!mIsbnSearchStr.empty())
-      filters.emplace_back(BookFilter::Key::ISBN, mIsbnSearchStr);
+      filters.emplace_back(mIsbnSearchStr, &Book::getIsbn);
+    if (!mLocationSearchStr.empty())
+      filters.emplace_back(mLocationSearchStr, &Book::getLocation);
 
-    auto results = Library::getInstance().fetchBooks(filters);
+    auto results = Librarian::fetchBooks(filters);
 
     mSearchResultsTable->DetachAllChildren();
-    mSearchResultsTable->Add(BookTable(
-        results, mColumnWidths,
-        {{std::tuple(
-            std::make_shared<std::string>("Add to Cart"),
-            [](Book book) {
-              Cart::getInstance().addBook(book);
-              EventPublisher::getInstance().publish("updateCart", "updateCart");
-            }
-        )}}
-    ));
+    mSearchResultsTable->Add(
+        BookTable(results, mColumnWidths, {{&BookCartMembershipButton}})
+    );
 
     // for (auto &book : results) {
     //   auto addToCartButton = Button("Add to Cart", [book] {
@@ -154,6 +154,7 @@ private:
   std::string mAuthorSearchStr;
   std::string mGenreSearchStr;
   std::string mIsbnSearchStr;
+  std::string mLocationSearchStr;
 
   ftxui::Component mSearchResultsTable;
   std::shared_ptr<std::vector<int>> mColumnWidths;

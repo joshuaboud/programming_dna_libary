@@ -22,22 +22,19 @@ public:
   }
 
   void addBook(const Book &book) {
-    if (std::find_if(mBooks.begin(), mBooks.end(), [&book](const Book &b) {
-          return b.getId() == book.getId();
-        }) != mBooks.end()) {
+    if (hasBook(book)) {
       return; // alreadt in cart
     }
     mBooks.emplace_back(book);
   }
 
   void removeBook(const Book &toRemove) {
-    mBooks.erase(
-        std::remove_if(
-            mBooks.begin(), mBooks.end(),
-            [&](const Book &book) { return book.getId() == toRemove.getId(); }
-        ),
-        mBooks.end()
-    );
+    auto toErase = std::remove(mBooks.begin(), mBooks.end(), toRemove);
+    mBooks.erase(toErase, mBooks.end());
+  }
+
+  bool hasBook(const Book &book) const {
+    return std::find(mBooks.begin(), mBooks.end(), book) != mBooks.end();
   }
 
 private:

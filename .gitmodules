@@ -1,3 +1,6 @@
 [submodule "lib/FTXUI"]
 	path = lib/FTXUI
 	url = https://github.com/ArthurSonzogni/FTXUI.git
+[submodule "lib/uuid_v4"]
+	path = lib/uuid_v4
+	url = https://github.com/crashoz/uuid_v4.git
