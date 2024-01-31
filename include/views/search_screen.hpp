@@ -21,6 +21,28 @@
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
+// class ActionButtonBase : public ftxui::ComponentBase {
+// public:
+//   ActionButtonBase(std::shared_ptr<std::string> buttonText, const
+//   std::function<void()> action) {
+//     using namespace ftxui;
+//     Add(Button(buttonText.get(), action));
+//   }
+
+// private:
+//   std::shared_ptr<std::string> mButtonText;
+//   ftxui::Component mButton;
+// };
+
+// ftxui::Component ActionButton(std::shared_ptr<std::string> buttonText, const
+// std::function<void()> action) {
+//   using namespace ftxui;
+
+//   auto button = Button(buttonText.get(), action);
+
+//   button->
+// }
+
 class SearchScreenBase : public ftxui::ComponentBase {
 public:
   SearchScreenBase()
@@ -31,7 +53,8 @@ public:
         mIsbnSearchStr(),
         mSearchResultsTable(ftxui::Container::Vertical({ftxui::Renderer([] {
           return ftxui::text("Press Search");
-        })})) {
+        })})),
+        mColumnWidths(std::make_shared<std::vector<int>>()) {
     using namespace ftxui;
 
     InputOption inputOptions = InputOption::Default();
@@ -96,12 +119,16 @@ private:
     auto results = Library::getInstance().fetchBooks(filters);
 
     mSearchResultsTable->DetachAllChildren();
-    mSearchResultsTable->Add(BookTable(results, {{
-      [] (Book book) {
-        Cart::getInstance().addBook(book);
-        EventPublisher::getInstance().publish("updateCart", "updateCart");
-      }
-    }}));
+    mSearchResultsTable->Add(BookTable(
+        results, mColumnWidths,
+        {{std::tuple(
+            std::make_shared<std::string>("Add to Cart"),
+            [](Book book) {
+              Cart::getInstance().addBook(book);
+              EventPublisher::getInstance().publish("updateCart", "updateCart");
+            }
+        )}}
+    ));
 
     // for (auto &book : results) {
     //   auto addToCartButton = Button("Add to Cart", [book] {
@@ -129,6 +156,7 @@ private:
   std::string mIsbnSearchStr;
 
   ftxui::Component mSearchResultsTable;
+  std::shared_ptr<std::vector<int>> mColumnWidths;
 };
 
 ftxui::Component SearchScreen() {

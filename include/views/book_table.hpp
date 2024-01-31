@@ -8,6 +8,7 @@
 #include <memory>
 #include <span>
 #include <string>
+#include <tuple>
 
 #include "ftxui/component/captured_mouse.hpp" // for ftxui
 #include "ftxui/component/component.hpp"      // for Input, Renderer, Vertical
@@ -114,7 +115,7 @@ private:
 
   ftxui::Component mContainer;
 
-  constexpr static const int sMaxInitialColumnWidth = 15;
+  constexpr static const int sMaxInitialColumnWidth = 25;
 
   ftxui::Component
   generateRow(std::span<const ftxui::Component> columns, int columnIndex = 0) {
@@ -173,10 +174,16 @@ ftxui::Component TextObserver(
 
 ftxui::Component BookTable(
     std::span<Book> books,
-    std::span<const std::function<void(Book)>> actions = {}
+    std::shared_ptr<std::vector<int>> columnWidths,
+    std::span<
+      const std::tuple<
+        const std::shared_ptr<std::string>,
+        const std::function<void(Book)>
+      >
+    >
+        actions = {}
 ) {
   using namespace ftxui;
-  auto columnWidths = std::make_shared<std::vector<int>>();
   columnWidths->reserve(32);
   auto tableHeader = ComponentTable(columnWidths);
   auto headerDummyBook =
@@ -206,8 +213,8 @@ ftxui::Component BookTable(
     if (!actions.empty()) {
       auto actionButtonContainer = Container::Horizontal({});
       for (auto action : actions) {
-        actionButtonContainer->Add(Button("Action", [book, action] {
-          action(book);
+        actionButtonContainer->Add(Button(std::get<0>(action).get(), [book, action] {
+          std::get<1>(action)(book);
         }));
       }
       bookRowComponents.emplace_back(Renderer(actionButtonContainer, [=] {
@@ -226,4 +233,17 @@ ftxui::Component BookTable(
            }) |
            flex;
   });
+}
+
+ftxui::Component BookTable(
+    std::span<Book> books,
+    std::span<
+      const std::tuple<
+        const std::shared_ptr<std::string>,
+        const std::function<void(Book)>
+      >
+    >
+        actions = {}
+) {
+  return BookTable(books, std::make_shared<std::vector<int>>(), actions);
 }
