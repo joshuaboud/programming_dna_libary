@@ -105,9 +105,7 @@ public:
   }
 
   bool has(const T &item) const {
-    return std::find_if(mItems.begin(), mItems.end(), [&, this](const T &x) {
-             return x.getId() == item.getId();
-           }) != mItems.end();
+    return std::find(mItems.begin(), mItems.end(), item) != mItems.end();
   }
 
 private:
