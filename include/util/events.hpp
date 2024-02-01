@@ -6,6 +6,7 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <forward_list>
 
 class EventSubscriber {
 public:
@@ -45,21 +46,20 @@ public:
       const std::string &event,
       const EventSubscriber::CallbackFunction &callback
   ) {
-    mSubscriptions[event].emplace_back(event, callback);
-    return mSubscriptions[event].back();
+    mSubscriptions[event].emplace_front(event, callback);
+    return mSubscriptions[event].front();
   }
 
   void unsubscribe(const EventSubscriber &subscriber) {
     auto &subscribersList = mSubscriptions[subscriber.getEvent()];
-    auto toErase =
-        std::remove(subscribersList.begin(), subscribersList.end(), subscriber);
-    subscribersList.erase(toErase, subscribersList.end());
+    subscribersList.remove(subscriber);
   }
 
   void publish(const std::string &event, const std::string &message) {
     auto it = mSubscriptions.find(event);
     if (it != mSubscriptions.end()) {
-      for (const auto &subscriber : it->second) {
+      auto &subscribers = it->second;
+      for (const auto &subscriber : subscribers) {
         subscriber.notify(message);
       }
     }
@@ -68,7 +68,7 @@ public:
 private:
   EventPublisher() = default;
 
-  std::unordered_map<std::string, std::vector<EventSubscriber>> mSubscriptions;
+  std::unordered_map<std::string, std::forward_list<EventSubscriber>> mSubscriptions;
 };
 
 class SubscribesToEvents {
