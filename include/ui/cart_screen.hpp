@@ -4,6 +4,8 @@
 #include <ui/book_table.hpp>
 #include <util/events.hpp>
 
+#include <ui/login_modal.hpp>
+
 #include <memory>
 #include <string>
 #include <tuple>
@@ -35,7 +37,20 @@ private:
     using namespace ftxui;
     auto books = Cart::getInstance().getBooks();
     DetachAllChildren();
-    Add(BookTable(books, mColumnWidths, {{&BookCartMembershipButton}}));
+
+    Add(Container::Vertical({
+            BookTable(books, mColumnWidths, {{&BookCartMembershipButton}}) |
+                Renderer(flex),
+            Container::Horizontal({Button(
+                "Check Out",
+                [] {
+                  Library::getInstance().checkOutBooks(
+                      Cart::getInstance().getBooks()
+                  );
+                }
+            )}),
+        }) |
+        Renderer(flex));
   }
 };
 

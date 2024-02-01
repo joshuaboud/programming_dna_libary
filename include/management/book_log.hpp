@@ -38,6 +38,30 @@ public:
     return matching;
   }
 
+  std::vector<BookCopy> getEntriesFor(const Book &book) const {
+    auto predicate = [&book](const BookCopy &entry) {
+      return book.getId() == entry.getBookId();
+    };
+    std::vector<BookCopy> matching;
+    std::copy_if(
+        mBookCopies.begin(), mBookCopies.end(), std::back_inserter(matching),
+        predicate
+    );
+    return matching;
+  }
+
+  std::vector<BookCopy> getEntriesFor(const Book &book, const User &user) const {
+    auto predicate = [&book, &user](const BookCopy &entry) {
+      return book.getId() == entry.getBookId() && user.getId() == entry.getUserId();
+    };
+    std::vector<BookCopy> matching;
+    std::copy_if(
+        mBookCopies.begin(), mBookCopies.end(), std::back_inserter(matching),
+        predicate
+    );
+    return matching;
+  }
+
 private:
   std::vector<BookCopy> mBookCopies;
 };

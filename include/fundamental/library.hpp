@@ -4,8 +4,10 @@
 #include <fundamental/collection.hpp>
 #include <fundamental/user.hpp>
 #include <management/book_log.hpp>
+#include <interactive/user_session.hpp>
 
 #include <util/get_executable_path.hpp>
+#include <util/uuid.hpp>
 
 class Library {
 private:
@@ -42,12 +44,32 @@ public:
   }
 
   bool checkOutBooks(std::span<Book> books) {
-    // TODO
-    return true;
+    if (auto user = UserSession::getInstance().getUser()) {
+      for (const auto &book : books) {
+        BookCopy logEntry;
+        logEntry.setId(getUuidGenerator().getUUID().str());
+        logEntry.setBookId(book.getId());
+        logEntry.setUserId(user->getId());
+        logEntry.setCheckOutDate(std::chrono::system_clock::now());
+        mBookLog.addEntry(logEntry);
+      }
+      return true;
+    }
+    return false;
   }
 
   bool checkInBooks(std::span<Book> books) {
-    // TODO
-    return true;
+    if (auto user = UserSession::getInstance().getUser()) {
+      for (const auto &book : books) {
+        auto entries = mBookLog.getEntriesFor(book, *user);
+        for (auto &entry : entries) {
+          entry.setCheckInDate(std::chrono::system_clock::now());
+          mBookLog.removeEntry(entry);
+          mBookLog.addEntry(entry);
+        }
+      }
+      return true;
+    }
+    return false;
   }
 };
