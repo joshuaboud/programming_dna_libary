@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <nlohmann/json.hpp>
+
 class Book {
 private:
   std::string mId;
@@ -22,15 +24,28 @@ public:
         mGenre("") {}
 
   // Parameterized Constructor
-  Book(const std::string &id, const std::string &title,
-       const std::string &author, const std::string &location,
-       const std::string &isbn, const std::string &genre)
+  Book(
+      const std::string &id, const std::string &title,
+      const std::string &author, const std::string &location,
+      const std::string &isbn, const std::string &genre
+  )
       : mId(id),
         mTitle(title),
         mAuthor(author),
         mLocation(location),
         mIsbn(isbn),
         mGenre(genre) {}
+
+  static Book fromJson(const nlohmann::json &j) {
+    Book book;
+    book.setId(j.at("id").get<std::string>());
+    book.setTitle(j.at("title").get<std::string>());
+    book.setAuthor(j.at("author").get<std::string>());
+    book.setLocation(j.at("location").get<std::string>());
+    book.setIsbn(j.at("isbn").get<std::string>());
+    book.setGenre(j.at("genre").get<std::string>());
+    return book;
+  }
 
   const std::string &getId() const {
     return mId;

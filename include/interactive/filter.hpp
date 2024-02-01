@@ -6,20 +6,20 @@
 #include <string>
 #include <vector>
 
-class BookFilter {
+template <typename T> class Filter {
 public:
-  using PropertyProvider = const std::string &(Book::*)() const;
+  using PropertyProvider = const std::string &(T::*)() const;
 
-  BookFilter() = default;
-  BookFilter(const std::string &searchText, PropertyProvider propertyProvider)
+  Filter() = default;
+  Filter(const std::string &searchText, PropertyProvider propertyProvider)
       : mSearchText(searchText),
         mPropertyProvider(propertyProvider) {}
 
-  bool passes(const Book &book) const {
+  bool passes(const T &obj) const {
     if (mPropertyProvider == nullptr)
       return false;
     return StringUtils::containsSubstring(
-        normalizeString((book.*mPropertyProvider)()),
+        normalizeString((obj.*mPropertyProvider)()),
         normalizeString(mSearchText)
     );
   }
@@ -33,28 +33,30 @@ private:
   }
 };
 
-class BookFiltersBuilder {
-public:
-  BookFiltersBuilder() : mFilters() {}
 
-  template <typename... Args> BookFiltersBuilder &addFilter(Args... args) {
+template<typename T>
+class FiltersBuilder {
+public:
+  FiltersBuilder() : mFilters() {}
+
+  template <typename... Args> FiltersBuilder<T> &addFilter(Args... args) {
     mFilters.emplace_back(std::forward<Args>(args)...);
     return *this;
   }
 
-  BookFiltersBuilder &addFilterIfStringNotEmpty(
+  FiltersBuilder<T> &addFilterIfStringNotEmpty(
       const std::string &searchText,
-      BookFilter::PropertyProvider propertyProvider
+      Filter<T>::PropertyProvider propertyProvider
   ) {
     if (!searchText.empty())
       return addFilter(searchText, propertyProvider);
     return *this;
   }
 
-  std::vector<BookFilter> get() {
+  std::vector<Filter<T>> get() {
     return std::move(mFilters);
   }
 
 private:
-  std::vector<BookFilter> mFilters;
+  std::vector<Filter<T>> mFilters;
 };

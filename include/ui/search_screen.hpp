@@ -1,6 +1,6 @@
 #pragma once
 
-#include <interactive/book_filter.hpp>
+#include <interactive/filter.hpp>
 #include <interactive/librarian.hpp>
 #include <management/cart.hpp>
 #include <util/events.hpp>
@@ -22,28 +22,6 @@
 #include "ftxui/dom/elements.hpp" // for text, hbox, separator, Element, operator|, vbox, border
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
-
-// class ActionButtonBase : public ftxui::ComponentBase {
-// public:
-//   ActionButtonBase(std::shared_ptr<std::string> buttonText, const
-//   std::function<void()> action) {
-//     using namespace ftxui;
-//     Add(Button(buttonText.get(), action));
-//   }
-
-// private:
-//   std::shared_ptr<std::string> mButtonText;
-//   ftxui::Component mButton;
-// };
-
-// ftxui::Component ActionButton(std::shared_ptr<std::string> buttonText, const
-// std::function<void()> action) {
-//   using namespace ftxui;
-
-//   auto button = Button(buttonText.get(), action);
-
-//   button->
-// }
 
 class SearchScreenBase : public ftxui::ComponentBase {
 public:
@@ -113,7 +91,7 @@ private:
     using namespace ftxui;
 
     auto filters =
-        BookFiltersBuilder()
+        FiltersBuilder<Book>()
             .addFilterIfStringNotEmpty(mTitleSearchStr, &Book::getTitle)
             .addFilterIfStringNotEmpty(mAuthorSearchStr, &Book::getAuthor)
             .addFilterIfStringNotEmpty(mGenreSearchStr, &Book::getGenre)

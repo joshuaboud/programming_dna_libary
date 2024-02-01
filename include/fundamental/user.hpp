@@ -32,6 +32,19 @@ public:
         mEmail(email),
         mPassword(password) {}
 
+  static User fromJson(const nlohmann::json &j) {
+    User user;
+    user.setId(j["id"]);
+    user.setFirstName(j["firstName"]);
+    user.setLastName(j["lastName"]);
+    user.setEmail(j["email"]);
+    if (j.contains("passwordHash"))
+      user.setPassword(Password::fromHash(j["passwordHash"]));
+    else
+      user.setPassword(Password::fromPlainText(j["password"]));
+    return user;
+  }
+
   const std::string &getId() const {
     return mId;
   }
