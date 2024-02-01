@@ -1,8 +1,8 @@
 #pragma once
 
 #include <fundamental/book.hpp>
-#include <ui/text_observer.hpp>
 #include <ui/book_action_buttons.hpp>
+#include <ui/text_observer.hpp>
 
 #include <algorithm>
 #include <array>
@@ -50,7 +50,7 @@ private:
 
   ftxui::Component mContainer;
 
-  constexpr static const int sMaxInitialColumnWidth = 25;
+  constexpr static const int sMaxInitialColumnWidth = 32;
 
   ftxui::Component
   generateRow(std::span<const ftxui::Component> columns, int columnIndex = 0) {
@@ -64,7 +64,7 @@ private:
     }
     auto tempElement = columns[columnIndex]->Render();
     tempElement->ComputeRequirement();
-    auto requiredWidth = tempElement->requirement().min_x;
+    auto requiredWidth = tempElement->requirement().min_x + 1;
     auto cappedWidth = std::min(requiredWidth, sMaxInitialColumnWidth);
     (*mColumnWidths)[columnIndex] =
         std::max(cappedWidth, (*mColumnWidths)[columnIndex]);
@@ -137,11 +137,14 @@ ftxui::Component BookTable(
     }
     tableBody->addRow(bookRowComponents);
   }
+  bool noResults = books.empty();
   return Renderer(Container::Vertical({tableHeader, tableBody}), [=] {
     return vbox({
                tableHeader->Render(),
                separator(),
-               tableBody->Render() | vscroll_indicator | yframe | flex,
+               noResults
+                   ? text("No results.") | bold
+                   : tableBody->Render() | vscroll_indicator | yframe | flex,
            }) |
            flex;
   });

@@ -111,17 +111,15 @@ public:
 private:
   void onSearch() {
     using namespace ftxui;
-    std::vector<BookFilter> filters;
-    if (!mTitleSearchStr.empty())
-      filters.emplace_back(mTitleSearchStr, &Book::getTitle);
-    if (!mAuthorSearchStr.empty())
-      filters.emplace_back(mAuthorSearchStr, &Book::getAuthor);
-    if (!mGenreSearchStr.empty())
-      filters.emplace_back(mGenreSearchStr, &Book::getGenre);
-    if (!mIsbnSearchStr.empty())
-      filters.emplace_back(mIsbnSearchStr, &Book::getIsbn);
-    if (!mLocationSearchStr.empty())
-      filters.emplace_back(mLocationSearchStr, &Book::getLocation);
+
+    auto filters =
+        BookFiltersBuilder()
+            .addFilterIfStringNotEmpty(mTitleSearchStr, &Book::getTitle)
+            .addFilterIfStringNotEmpty(mAuthorSearchStr, &Book::getAuthor)
+            .addFilterIfStringNotEmpty(mGenreSearchStr, &Book::getGenre)
+            .addFilterIfStringNotEmpty(mIsbnSearchStr, &Book::getIsbn)
+            .addFilterIfStringNotEmpty(mLocationSearchStr, &Book::getLocation)
+            .get();
 
     auto results = Librarian::fetchBooks(filters);
 
@@ -129,25 +127,6 @@ private:
     mSearchResultsTable->Add(
         BookTable(results, mColumnWidths, {{&BookCartMembershipButton}})
     );
-
-    // for (auto &book : results) {
-    //   auto addToCartButton = Button("Add to Cart", [book] {
-    //     Cart::getInstance().addBook(book);
-    //     EventPublisher::getInstance().publish("updateCart", "updateCart");
-    //   });
-
-    //   mSearchResultsTable
-    //       ->Add(Renderer(addToCartButton, [book, addToCartButton, this] {
-    //         return hbox({
-    //                    BookRowView(book),
-    //                    separator(),
-    //                    vbox({
-    //                        addToCartButton->Render(),
-    //                    }),
-    //                }) |
-    //                xflex;
-    //       }));
-    // }
   }
 
   std::string mTitleSearchStr;
