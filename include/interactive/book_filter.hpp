@@ -5,14 +5,14 @@
 #include <functional>
 #include <string>
 
-using BookPropertyProvider = const std::string &(Book::*)() const;
 
-// TODO
 class BookFilter {
 public:
+  using PropertyProvider = const std::string &(Book::*)() const;
+
   BookFilter() = default;
   BookFilter(
-      const std::string &searchText, BookPropertyProvider propertyProvider
+      const std::string &searchText, PropertyProvider propertyProvider
   )
       : mSearchText(searchText),
         mPropertyProvider(propertyProvider) {}
@@ -28,5 +28,5 @@ public:
 
 private:
   std::string mSearchText;
-  BookPropertyProvider mPropertyProvider;
+  PropertyProvider mPropertyProvider;
 };
