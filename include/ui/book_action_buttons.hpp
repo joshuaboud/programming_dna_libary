@@ -9,7 +9,7 @@
 #include <string>
 
 class BookCartMembershipButtonBase : public ftxui::ComponentBase,
-                                     public SubscribesToEvents {
+                                     public EventSubscriber {
 public:
   BookCartMembershipButtonBase(const Book &book) : mBook(book), mButtonText() {
     using namespace ftxui;

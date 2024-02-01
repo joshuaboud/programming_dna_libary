@@ -17,7 +17,7 @@
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
-class CartScreenBase : public ftxui::ComponentBase, public SubscribesToEvents {
+class CartScreenBase : public ftxui::ComponentBase, public EventSubscriber {
 public:
   CartScreenBase()
       : ftxui::ComponentBase(),

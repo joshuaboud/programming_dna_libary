@@ -19,7 +19,7 @@
 #include "ftxui/dom/table.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
-class MainViewBase : public ftxui::ComponentBase, public SubscribesToEvents {
+class MainViewBase : public ftxui::ComponentBase, public EventSubscriber {
 public:
   MainViewBase()
       : ftxui::ComponentBase(),

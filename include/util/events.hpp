@@ -3,16 +3,16 @@
 #include <util/uuid.hpp>
 
 #include <algorithm>
+#include <forward_list>
 #include <functional>
 #include <string>
 #include <unordered_map>
-#include <forward_list>
 
-class EventSubscriber {
+class EventSubscription {
 public:
   using CallbackFunction = std::function<void(const std::string &)>;
 
-  EventSubscriber(std::string event, CallbackFunction callback)
+  EventSubscription(std::string event, CallbackFunction callback)
       : mEvent(event),
         mCallback(callback),
         mId(getUuidGenerator().getUUID()) {}
@@ -25,7 +25,7 @@ public:
     mCallback(message);
   }
 
-  bool operator==(const EventSubscriber &other) const {
+  bool operator==(const EventSubscription &other) const {
     return mId == other.mId;
   }
 
@@ -42,15 +42,15 @@ public:
     return instance;
   }
 
-  const EventSubscriber &subscribe(
+  const EventSubscription &subscribe(
       const std::string &event,
-      const EventSubscriber::CallbackFunction &callback
+      const EventSubscription::CallbackFunction &callback
   ) {
     mSubscriptions[event].emplace_front(event, callback);
     return mSubscriptions[event].front();
   }
 
-  void unsubscribe(const EventSubscriber &subscriber) {
+  void unsubscribe(const EventSubscription &subscriber) {
     auto &subscribersList = mSubscriptions[subscriber.getEvent()];
     subscribersList.remove(subscriber);
   }
@@ -68,16 +68,31 @@ public:
 private:
   EventPublisher() = default;
 
-  std::unordered_map<std::string, std::forward_list<EventSubscriber>> mSubscriptions;
+  std::unordered_map<std::string, std::forward_list<EventSubscription>>
+      mSubscriptions;
 };
 
-class SubscribesToEvents {
+/**
+ * @brief Inherit from this class to allow for automatic unsubscription when
+ * destructor is called
+ * 
+ * e.g.
+ * class MyClass : public EventSubscriber {
+ *   MyClass() {
+ *     subscribe("eventName", [] (const std::string &) {
+ *       handleEvent();
+ *     });
+ *   }
+ * };
+ *
+ */
+class EventSubscriber {
 public:
-  SubscribesToEvents(const SubscribesToEvents &other) = delete;
+  EventSubscriber(const EventSubscriber &other) = delete;
 
 protected:
-  SubscribesToEvents() = default;
-  ~SubscribesToEvents() {
+  EventSubscriber() = default;
+  ~EventSubscriber() {
     for (auto &handle : mSubscriptionHandles) {
       EventPublisher::getInstance().unsubscribe(handle);
     }
@@ -90,5 +105,5 @@ protected:
   }
 
 private:
-  std::vector<EventSubscriber> mSubscriptionHandles;
+  std::vector<EventSubscription> mSubscriptionHandles;
 };
