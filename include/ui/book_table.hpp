@@ -23,8 +23,11 @@
 
 class ComponentTableBase : public ftxui::ComponentBase {
 public:
-  ComponentTableBase(std::shared_ptr<std::vector<int>> columnWidths)
+  ComponentTableBase(
+      std::shared_ptr<std::vector<int>> columnWidths, bool resizable = false
+  )
       : mColumnWidths(columnWidths),
+        mResizable(resizable),
         mContainer(ftxui::Container::Vertical({})) {
     Add(mContainer);
   }
@@ -45,15 +48,70 @@ public:
     return mColumnWidths;
   }
 
+  ftxui::Element Render() {
+    using namespace ftxui;
+    return mContainer->Render() | vscroll_indicator | yframe;
+  }
+
+  bool Focusable() const override {
+    return true;
+  }
+
 private:
   std::shared_ptr<std::vector<int>> mColumnWidths;
-
+  bool mResizable;
   ftxui::Component mContainer;
 
   constexpr static const int sMaxInitialColumnWidth = 32;
 
-  ftxui::Component
-  generateRow(std::span<const ftxui::Component> columns, int columnIndex = 0) {
+  void computeColumnWidths(std::span<const ftxui::Component> columns) {
+    for (int columnIndex = 0; columnIndex < columns.size(); ++columnIndex) {
+      if (columnIndex >= mColumnWidths->size()) {
+        mColumnWidths->emplace_back();
+      }
+      auto tempElement = columns[columnIndex]->Render();
+      tempElement->ComputeRequirement();
+      auto requiredWidth = tempElement->requirement().min_x + 1;
+      auto cappedWidth = std::min(requiredWidth, sMaxInitialColumnWidth);
+      (*mColumnWidths)[columnIndex] =
+          std::max(cappedWidth, (*mColumnWidths)[columnIndex]);
+    }
+  }
+
+  ftxui::Component generateRow(std::span<const ftxui::Component> columns) {
+    using namespace ftxui;
+
+    if (mResizable) {
+      return generateResizableRow(columns);
+    }
+
+    computeColumnWidths(columns);
+
+    auto row = Container::Horizontal({});
+
+    for (auto columnIter = columns.begin(); columnIter != columns.end();
+         ++columnIter) {
+      auto component = *columnIter;
+      if (columnIter == columns.begin()) {
+        component |= Renderer(flex);
+      } else {
+        auto columnIndex = columnIter - columns.begin();
+        component = Renderer(component, [component, columnIndex, this] {
+          return component->Render() |
+                 size(WIDTH, EQUAL, (*mColumnWidths)[columnIndex]);
+        });
+      }
+      row->Add(component);
+      if (std::next(columnIter) != columns.end())
+        row->Add(Renderer([] { return separator(); }));
+    }
+
+    return row;
+  }
+
+  ftxui::Component generateResizableRow(
+      std::span<const ftxui::Component> columns, int columnIndex = 0
+  ) {
     using namespace ftxui;
     if (columnIndex == columns.size() - 1) {
       // base case
@@ -69,26 +127,29 @@ private:
     (*mColumnWidths)[columnIndex] =
         std::max(cappedWidth, (*mColumnWidths)[columnIndex]);
     return ResizableSplitLeft(
-        columns[columnIndex], generateRow(columns, columnIndex + 1),
+        columns[columnIndex], generateResizableRow(columns, columnIndex + 1),
         &(*mColumnWidths)[columnIndex]
     );
   }
 };
 
-std::shared_ptr<ComponentTableBase>
-ComponentTable(std::shared_ptr<std::vector<int>> columnWidths) {
-  return std::make_shared<ComponentTableBase>(columnWidths);
+std::shared_ptr<ComponentTableBase> ComponentTable(
+    std::shared_ptr<std::vector<int>> columnWidths, bool resizable = false
+) {
+  return std::make_shared<ComponentTableBase>(columnWidths, resizable);
 }
 
-std::shared_ptr<ComponentTableBase> ComponentTable() {
+std::shared_ptr<ComponentTableBase> ComponentTable(bool resizable = false) {
   auto widths = std::make_shared<std::vector<int>>();
   widths->reserve(32);
-  return std::make_shared<ComponentTableBase>(widths);
+  return std::make_shared<ComponentTableBase>(widths, resizable);
 }
 
-std::shared_ptr<ComponentTableBase>
-ComponentTable(std::span<std::span<const ftxui::Component>> componentsGrid) {
-  auto table = ComponentTable();
+std::shared_ptr<ComponentTableBase> ComponentTable(
+    std::span<std::span<const ftxui::Component>> componentsGrid,
+    bool resizable = false
+) {
+  auto table = ComponentTable(resizable);
   table->setContent(componentsGrid);
   return table;
 }
@@ -99,7 +160,7 @@ ftxui::Component BookTable(
 ) {
   using namespace ftxui;
   columnWidths->reserve(32);
-  auto tableHeader = ComponentTable(columnWidths);
+  auto tableHeader = ComponentTable(columnWidths, true);
   auto headerDummyBook =
       Book("", "Title", "Author", "Location", "ISBN", "Genre");
   auto tableHeaderComponents = std::vector{
@@ -115,7 +176,7 @@ ftxui::Component BookTable(
     }));
   }
   tableHeader->addRow(tableHeaderComponents);
-  auto tableBody = ComponentTable(columnWidths);
+  auto tableBody = ComponentTable(columnWidths, true);
   for (auto &book : books) {
     auto bookRowComponents = std::vector{
         TextObserver(book, &Book::getTitle),
@@ -142,9 +203,8 @@ ftxui::Component BookTable(
     return vbox({
                tableHeader->Render(),
                separator(),
-               noResults
-                   ? text("No results.") | bold
-                   : tableBody->Render() | vscroll_indicator | yframe | flex,
+               noResults ? text("No results.") | bold
+                         : tableBody->Render() | flex,
            }) |
            flex;
   });

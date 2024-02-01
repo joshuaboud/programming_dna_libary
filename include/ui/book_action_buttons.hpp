@@ -38,6 +38,10 @@ public:
     EventPublisher::getInstance().publish("updateCart", "");
   }
 
+  bool Focusable() const {
+    return true;
+  }
+
 private:
   Book mBook;
   std::string mButtonText;
